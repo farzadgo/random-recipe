@@ -37,14 +37,14 @@ const cuisines: string[] = [
   'Vietnamese',
 ];
 
+export const apiKey = 'e433660ae5d947399f8d11957c762a73';
+// export const apiKey = 'a2c4a76cc2764318a49f81c7c0f21fc0';
 
 const Home = () => {
 
-  // const apiKey = 'e433660ae5d947399f8d11957c762a73';
-  const apiKey = 'a2c4a76cc2764318a49f81c7c0f21fc0';
   let baseUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&number=1&addRecipeInformation=true&sort=random`;
 
-  const [query, setQuery] = useState('' as string)
+  const [query, setQuery] = useState(baseUrl as string)
   
   const [calories, setCalories] = useState('' as string)
   const [cuisine, setCuisine] = useState('' as string)
@@ -53,7 +53,7 @@ const Home = () => {
     isGlutenFree: false
   } as Diets)
   
-  const { loading, data, error, fetchData } = useDataFetch(query, 'main');
+  const { loading, noResults, data, error, fetchData } = useDataFetch(query, 'main', false);
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
@@ -114,14 +114,15 @@ const Home = () => {
               {cuisines.map((cuisine, i) => <option key={i} value={cuisine}> {cuisine} </option>)}
             </select>
 
-            <input type='number' className='input input-sm input-bordered w-full my-2' placeholder='Calories' value={calories} onChange={handleCalories}/>
+            <input type='number' className='input input-sm input-bordered w-full my-2' placeholder='Max Calories' value={calories} onChange={handleCalories}/>
 
           </div>
         </details>
         
       </ContainerCard>     
 
-      { loading ? <Loader /> : <Result data={data} error={error}/> }
+      { loading ? <Loader /> : <Result data={data} error={error} /> }
+      { noResults && <p className='text-center'> No resource with given identifier found. 😥 </p>}
 
     </Container>
   )

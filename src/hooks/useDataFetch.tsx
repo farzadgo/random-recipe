@@ -1,36 +1,44 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { Data, Step } from '../types';
 
-// const apiKey = process.env.REACT_APP_API_KEY;
 
-const useDataFetch = (query: string, flag: string) => {
+const useDataFetch = (query: string, flag: string, fetchOnMount: boolean = false) => {
 
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState({} as Data)
   const [error, setError] = useState({} as AxiosError)
   const [steps, setStesp] = useState({} as Step[])
+  const [noResults, setNoResults] = useState(false)
 
   // const controller = new AbortController();
+  const reset = () => {
+    setLoading(true)
+    setData({} as Data)
+    setError({} as AxiosError)
+    setStesp([] as Step[])
+    setNoResults(false)
+  }
 
-  const fetchData = async () => {
-    setError({} as AxiosError);
-    setData({} as Data);
-    setLoading(true);
-
+  const fetchData = useCallback( async () => {
+    reset()
     try {
       const response = await axios(query)
-      if (flag === 'main') setData(response.data.results[0] as Data)
+      if (flag === 'main') response.data.results.length === 0 ? setNoResults(true) : setData(response.data.results[0] as Data)
       if (flag === 'steps') setStesp(response.data[0].steps as Step[])
       setLoading(false)
     } catch (error) {
       setError(error as AxiosError)
       setLoading(false)
     }
-  }
+  }, [query, flag])
 
-  return { loading, data, steps, error, fetchData }
+
+  useEffect(() => {
+    if (fetchOnMount) fetchData()
+  }, [fetchOnMount])
+
+  return { loading, noResults, data, steps, error, fetchData }
 }
 
 export default useDataFetch
-

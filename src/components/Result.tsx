@@ -4,13 +4,12 @@ import { Data, Step } from '../types';
 import ContainerCard from './ContainerCard';
 import { Clock, ExternalLink, X } from 'react-feather';
 import useDataFetch from '../hooks/useDataFetch';
+import { apiKey } from '../routes/Home';
 
 
 const Result = ({ data, error }: { data: Data, error: AxiosError }) => {
   
-  // const apiKey = 'e433660ae5d947399f8d11957c762a73';
-  const apiKey = 'a2c4a76cc2764318a49f81c7c0f21fc0';
-  const query = `https://api.spoonacular.com/recipes/${data.id}/analyzedInstructions?apiKey=${apiKey}`;
+  const [query, setQuery] = useState('');
 
   const [errorMessage, setErrorMessage] = useState('')
   const [showRecipe, setShowRecipe] = useState(false)
@@ -27,17 +26,16 @@ const Result = ({ data, error }: { data: Data, error: AxiosError }) => {
   }
 
   useEffect(() => {
-    if (steps.length > 0) {
-      setShowSteps(true)
-    }
+    if (steps.length) setShowSteps(true)
   }, [steps])
   
 
   useEffect(() => {
-    if (Object.keys(error).length) {
-      setErrorMessage(error.message)
+    if (Object.keys(error).length) setErrorMessage(error.message)
+    if (Object.keys(data).length) {
+      setShowRecipe(true)
+      setQuery(`https://api.spoonacular.com/recipes/${data.id}/analyzedInstructions?apiKey=${apiKey}`)
     }
-    Object.keys(data).length > 0 ? setShowRecipe(true) : setShowRecipe(false)
   }, [data, error])
   
 
