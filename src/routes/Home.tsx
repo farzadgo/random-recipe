@@ -3,7 +3,7 @@ import Container from '../components/Container';
 import ContainerCard from '../components/ContainerCard';
 import Loader from '../components/Loader';
 import Result from '../components/Result';
-import { Diets } from '../types';
+import { Diets, Recipe } from '../types';
 import useDataFetch from '../hooks/useDataFetch';
 
 
@@ -37,10 +37,10 @@ const cuisines: string[] = [
   'Vietnamese',
 ];
 
-export const apiKey = 'e433660ae5d947399f8d11957c762a73';
-// export const apiKey = 'a2c4a76cc2764318a49f81c7c0f21fc0';
+// export const apiKey = 'e433660ae5d947399f8d11957c762a73';
+export const apiKey = 'a2c4a76cc2764318a49f81c7c0f21fc0';
 
-const Home = () => {
+const Home = ({ handleRecipe }: {handleRecipe: (recipe: Recipe) => void}) => {
 
   let baseUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&number=1&addRecipeInformation=true&sort=random`;
 
@@ -121,7 +121,7 @@ const Home = () => {
         
       </ContainerCard>     
 
-      { loading ? <Loader /> : <Result data={data} error={error} /> }
+      { loading ? <Loader /> : <Result data={data} error={error} handleRecipe={handleRecipe} /> }
       { noResults && <p className='text-center'> No resource with given identifier found. 😥 </p>}
 
     </Container>

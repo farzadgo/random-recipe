@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { Data, Step } from '../types';
+import { Data, Step, Recipe } from '../types';
 import ContainerCard from './ContainerCard';
-import { Clock, ExternalLink, X } from 'react-feather';
+import { Clock, ExternalLink, Heart, List, X } from 'react-feather';
 import useDataFetch from '../hooks/useDataFetch';
 import { apiKey } from '../routes/Home';
 
 
-const Result = ({ data, error }: { data: Data, error: AxiosError }) => {
+const Result = ({ data, error, handleRecipe }: { data: Data, error: AxiosError, handleRecipe: (recipe: Recipe) => void }) => {
   
   const [query, setQuery] = useState('');
+  const [liked, setLiked] = useState(false)
 
   const [errorMessage, setErrorMessage] = useState('')
   const [showRecipe, setShowRecipe] = useState(false)
@@ -25,6 +26,11 @@ const Result = ({ data, error }: { data: Data, error: AxiosError }) => {
     }
   }
 
+  const handleFavorite = () => {
+    handleRecipe({ id: data.id, title: data.title })
+    setLiked(!liked)
+  }
+
   useEffect(() => {
     if (steps.length) setShowSteps(true)
   }, [steps])
@@ -35,6 +41,13 @@ const Result = ({ data, error }: { data: Data, error: AxiosError }) => {
     if (Object.keys(data).length) {
       setShowRecipe(true)
       setQuery(`https://api.spoonacular.com/recipes/${data.id}/analyzedInstructions?apiKey=${apiKey}`)
+
+      let likedRecipes = localStorage.getItem('recipes')
+      if (likedRecipes) {
+        if (JSON.parse(likedRecipes).filter((r: Recipe) => r.id === data.id).length > 0) {
+          setLiked(true)
+        }
+      }
     }
   }, [data, error])
   
@@ -67,7 +80,16 @@ const Result = ({ data, error }: { data: Data, error: AxiosError }) => {
             <i> Summary: &nbsp;</i> <span className='text-sm' dangerouslySetInnerHTML={{__html: data.summary}} />
           </div>
 
-          <button onClick={handleInstructions} className='btn btn-secondary mx-auto w-full rounded-full sm:w-56 my-6'> Get Instructions </button>
+          <div className='flex my-6 justify-evenly'>
+            <button className='btn btn-primary rounded-full' onClick={handleInstructions} >
+              Get Instructions
+              <List className='h-5 w-5 ml-2' />
+            </button>
+            <button className='btn btn-secondary rounded-full' onClick={handleFavorite}>
+              Add to Favorites
+              <Heart className={`h-5 w-5 ml-2 ${liked ? 'fill-current' : 'fill-none'}`} />
+            </button>
+          </div>
 
           <div className='flex gap-3'>
             <i> Source: </i>

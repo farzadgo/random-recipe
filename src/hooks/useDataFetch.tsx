@@ -25,6 +25,7 @@ const useDataFetch = (query: string, flag: string, fetchOnMount: boolean = false
     try {
       const response = await axios(query)
       if (flag === 'main') response.data.results.length === 0 ? setNoResults(true) : setData(response.data.results[0] as Data)
+      if (flag === 'details') setData(response.data as Data)
       if (flag === 'steps') setStesp(response.data[0].steps as Step[])
       setLoading(false)
     } catch (error) {

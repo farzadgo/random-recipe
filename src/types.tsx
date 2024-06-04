@@ -16,6 +16,10 @@ export type Data = {
   sourceUrl: string,
 }
 
+export type Recipe = {
+  id: number,
+  title: string,
+}
 
 // type Temperature = {
 //   number: number;
